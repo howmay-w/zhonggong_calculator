@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>漢字中宮收放程度計算機｜指標B</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700;900&family=Noto+Serif+TC:wght@200;300;400;500;600;700;900&family=Zen+Kaku+Gothic+Antique:wght@300;400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f0f0f0;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+      }
+      label {
+        display: block;
+        margin-top: 10px;
+        text-align: center;
+      }
+      input,
+      select {
+        width: 90%;
+        padding: 8px 10px;
+        margin-top: 5px;
+        font-size: 1em;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        height: 38px;
+        background: #fff;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 1em;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      /* 預覽按鈕專用顏色 */
+      .preview-btn {
+        background-color: #b0bec5;
+        color: #222;
+      }
+      .preview-btn:hover {
+        background-color: #78909c;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      .character-preview {
+        width: 100px;
+        height: 100px;
+      }
+      .noto-sans-tc-thin {
+        font-family: "Noto Sans TC", sans-serif;
+        font-weight: 100;
+      }
+      .noto-sans-tc-light {
+        font-family: "Noto Sans TC", sans-serif;
+        font-weight: 300;
+      }
+      .noto-sans-tc-regular {
+        font-family: "Noto Sans TC", sans-serif;
+        font-weight: 400;
+      }
+      .noto-sans-tc-medium {
+        font-family: "Noto Sans TC", sans-serif;
+        font-weight: 500;
+      }
+      .noto-sans-tc-bold {
+        font-family: "Noto Sans TC", sans-serif;
+        font-weight: 700;
+      }
+      .noto-sans-tc-black {
+        font-family: "Noto Sans TC", sans-serif;
+        font-weight: 900;
+      }
+
+      .noto-serif-tc-extra-light {
+        font-family: "Noto Serif TC", serif;
+        font-weight: 200;
+      }
+      .noto-serif-tc-light {
+        font-family: "Noto Serif TC", serif;
+        font-weight: 300;
+      }
+      .noto-serif-tc-regular {
+        font-family: "Noto Serif TC", serif;
+        font-weight: 400;
+      }
+      .noto-serif-tc-medium {
+        font-family: "Noto Serif TC", serif;
+        font-weight: 500;
+      }
+      .noto-serif-tc-semi-bold {
+        font-family: "Noto Serif TC", serif;
+        font-weight: 600;
+      }
+      .noto-serif-tc-bold {
+        font-family: "Noto Serif TC", serif;
+        font-weight: 700;
+      }
+      .noto-serif-tc-black {
+        font-family: "Noto Serif TC", serif;
+        font-weight: 900;
+      }
+
+      .zen-kaku-gothic-antique-light {
+        font-family: "Zen Kaku Gothic Antique", sans-serif;
+        font-weight: 300;
+      }
+      .zen-kaku-gothic-antique-regular {
+        font-family: "Zen Kaku Gothic Antique", sans-serif;
+        font-weight: 400;
+      }
+      .zen-kaku-gothic-antique-medium {
+        font-family: "Zen Kaku Gothic Antique", sans-serif;
+        font-weight: 500;
+      }
+      .zen-kaku-gothic-antique-bold {
+        font-family: "Zen Kaku Gothic Antique", sans-serif;
+        font-weight: 700;
+      }
+      .zen-kaku-gothic-antique-black {
+        font-family: "Zen Kaku Gothic Antique", sans-serif;
+        font-weight: 900;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+        vertical-align: middle;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      .density-preview {
+        width: 100px;
+        height: 100px;
+        border: 1px solid #ddd;
+      }
+      .font-compare-col {
+        flex: 1;
+        min-width: 160px;
+        background: #fafafa;
+        border-radius: 8px;
+        padding: 16px 8px 18px 8px;
+        box-shadow: 0 0 4px #ddd;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .input-area {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .preview-canvas {
+        display: block;
+        margin: 0 auto 8px auto;
+      }
+      .analyze-result {
+        margin-top: 8px;
+        text-align: center;
+        font-size: 0.98em;
+        line-height: 1.7;
+      }
+      .fontPreviewResult {
+        min-height: 8px;
+      }
+      .googleFontSection,
+      .localFontSection {
+        width: 100%;
+        text-align: center;
+      }
+      .font-compare-col label {
+        margin-bottom: 2px;
+        margin-top: 8px;
+      }
+      @media (max-width: 900px) {
+        #fontCompareRow {
+          flex-direction: column;
+          gap: 12px;
+        }
+        .font-compare-col {
+          min-width: unset;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>漢字中宮收放程度計算機｜指標Ｂ</h1>
+      <div
+        style="
+          text-align: center;
+          color: #505050;
+          font-size: 0.9em;
+          margin-bottom: 12px;
+          line-height: 1.5;
+        "
+      >
+        <strong>使用說明：</strong>
+        <br />
+        1. 請用 Chrome 瀏覽器開啟，方可正確計算
+        <br />
+        2. 請手動在 Chrome
+        網址列輸入：chrome://flags/#enable-experimental-web-platform-features，啟用
+        Experimental Web Platform features，方可讀取本機字型
+        <br />
+        3. 引入 Google fonts 網頁字型時，需稍等片刻才會正確讀取
+        <br />
+        4. 建議在同字體風格、字重、字體結構下比較，排序結果更具參考性
+        <br />
+        5. 可點選<a href="/index.html">此連結</a>切換到有 3 種指標的版本
+      </div>
+      <!-- 漢字輸入 -->
+      <label for="singleCharacter">輸入要計算的漢字，可單字或字串：</label>
+      <input
+        type="text"
+        id="singleCharacter"
+        value="愛永東文字"
+        placeholder="可輸入多個漢字"
+        style="
+          width: 98%;
+          min-height: 60px;
+          font-size: 1.5em;
+          padding: 12px;
+          text-align: left;
+          border-radius: 8px;
+          box-sizing: border-box;
+          margin-bottom: 8px;
+          resize: vertical;
+        "
+      />
+      <!-- 五個橫排欄位 -->
+      <div
+        id="fontCompareRow"
+        style="
+          display: flex;
+          gap: 24px;
+          margin-top: 32px;
+          justify-content: space-between;
+          max-width: 1200px;
+        "
+      >
+        <div
+          class="font-compare-col"
+          style="
+            flex: 1;
+            min-width: 160px;
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 0 4px #ddd;
+          "
+        >
+          <div id="fontCol0">
+            <div class="input-area">
+              <label>來源：</label>
+              <select class="fontSourceSelect" data-idx="0">
+                <option value="google" selected>Google Fonts</option>
+                <option value="local">本機字體</option>
+              </select>
+              <div class="googleFontSection">
+                <label>字體：</label>
+                <select class="fontNameSelect" data-idx="0">
+                  <option value="Noto Sans TC" selected>Noto Sans TC</option>
+                  <option value="Zen Kaku Gothic Antique">
+                    Zen Kaku Gothic Antique
+                  </option>
+                </select>
+                <label>字重：</label>
+                <select class="fontWeightSelect" data-idx="0">
+                  <option value="100">100</option>
+                  <option value="300">300</option>
+                  <option value="400" selected>400</option>
+                  <option value="500">500</option>
+                  <option value="700">700</option>
+                  <option value="900">900</option>
+                </select>
+              </div>
+              <div class="localFontSection" style="display: none">
+                <label>字體：</label>
+                <input
+                  type="text"
+                  class="localFontNameInput"
+                  data-idx="0"
+                  value="Hiragino Sans"
+                  list="fontList"
+                  placeholder="例如：Hiragino Sans"
+                />
+                <label>字重：</label>
+                <input
+                  type="number"
+                  class="localFontWeightInput"
+                  data-idx="0"
+                  value="500"
+                  min="100"
+                  max="900"
+                  step="100"
+                />
+              </div>
+              <button
+                type="button"
+                class="preview-btn"
+                onclick="previewSingle(0)"
+                style="margin-top: 8px"
+              >
+                預覽
+              </button>
+            </div>
+            <div class="fontPreviewResult" id="fontPreviewResult0"></div>
+          </div>
+        </div>
+        <div
+          class="font-compare-col"
+          style="
+            flex: 1;
+            min-width: 160px;
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 0 4px #ddd;
+          "
+        >
+          <div id="fontCol1">
+            <div class="input-area">
+              <label>來源：</label>
+              <select class="fontSourceSelect" data-idx="1">
+                <option value="google" selected>Google Fonts</option>
+                <option value="local">本機字體</option>
+              </select>
+              <div class="googleFontSection">
+                <label>字體：</label>
+                <select class="fontNameSelect" data-idx="1">
+                  <option value="Noto Sans TC">Noto Sans TC</option>
+                  <option value="Zen Kaku Gothic Antique" selected>
+                    Zen Kaku Gothic Antique
+                  </option>
+                </select>
+                <label>字重：</label>
+                <select class="fontWeightSelect" data-idx="1">
+                  <option value="100">100</option>
+                  <option value="300">300</option>
+                  <option value="400" selected>400</option>
+                  <option value="500">500</option>
+                  <option value="700">700</option>
+                  <option value="900">900</option>
+                </select>
+              </div>
+              <div class="localFontSection" style="display: none">
+                <label>字體：</label>
+                <input
+                  type="text"
+                  class="localFontNameInput"
+                  data-idx="1"
+                  value="PingFang TC"
+                  list="fontList"
+                  placeholder="例如：PingFang TC"
+                />
+                <label>字重：</label>
+                <input
+                  type="number"
+                  class="localFontWeightInput"
+                  data-idx="1"
+                  value="500"
+                  min="100"
+                  max="900"
+                  step="100"
+                />
+              </div>
+              <button
+                type="button"
+                class="preview-btn"
+                onclick="previewSingle(1)"
+                style="margin-top: 8px"
+              >
+                預覽
+              </button>
+            </div>
+            <div class="fontPreviewResult" id="fontPreviewResult1"></div>
+          </div>
+        </div>
+        <div
+          class="font-compare-col"
+          style="
+            flex: 1;
+            min-width: 160px;
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 0 4px #ddd;
+          "
+        >
+          <div id="fontCol2">
+            <div class="input-area">
+              <label>來源：</label>
+              <select class="fontSourceSelect" data-idx="2">
+                <option value="google">Google Fonts</option>
+                <option value="local" selected>本機字體</option>
+              </select>
+              <div class="googleFontSection" style="display: none">
+                <label>字體：</label>
+                <select class="fontNameSelect" data-idx="2">
+                  <option value="Noto Sans TC">Noto Sans TC</option>
+                  <option value="Zen Kaku Gothic Antique">
+                    Zen Kaku Gothic Antique
+                  </option>
+                </select>
+                <label>字重：</label>
+                <select class="fontWeightSelect" data-idx="2">
+                  <option value="100">100</option>
+                  <option value="300">300</option>
+                  <option value="400" selected>400</option>
+                  <option value="500">500</option>
+                  <option value="700">700</option>
+                  <option value="900">900</option>
+                </select>
+              </div>
+              <div class="localFontSection">
+                <label>字體：</label>
+                <input
+                  type="text"
+                  class="localFontNameInput"
+                  data-idx="2"
+                  value="IBM Plex Sans TC"
+                  list="fontList"
+                  placeholder="例如：IBM Plex Sans TC"
+                />
+                <label>字重：</label>
+                <input
+                  type="number"
+                  class="localFontWeightInput"
+                  data-idx="2"
+                  value="500"
+                  min="100"
+                  max="900"
+                  step="100"
+                />
+              </div>
+              <button
+                type="button"
+                class="preview-btn"
+                onclick="previewSingle(2)"
+                style="margin-top: 8px"
+              >
+                預覽
+              </button>
+            </div>
+            <div class="fontPreviewResult" id="fontPreviewResult2"></div>
+          </div>
+        </div>
+        <div
+          class="font-compare-col"
+          style="
+            flex: 1;
+            min-width: 160px;
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 0 4px #ddd;
+          "
+        >
+          <div id="fontCol3">
+            <div class="input-area">
+              <label>來源：</label>
+              <select class="fontSourceSelect" data-idx="3">
+                <option value="google">Google Fonts</option>
+                <option value="local" selected>本機字體</option>
+              </select>
+              <div class="googleFontSection" style="display: none">
+                <label>字體：</label>
+                <select class="fontNameSelect" data-idx="3">
+                  <option value="Noto Sans TC">Noto Sans TC</option>
+                  <option value="Zen Kaku Gothic Antique">
+                    Zen Kaku Gothic Antique
+                  </option>
+                </select>
+                <label>字重：</label>
+                <select class="fontWeightSelect" data-idx="3">
+                  <option value="100">100</option>
+                  <option value="300">300</option>
+                  <option value="400" selected>400</option>
+                  <option value="500">500</option>
+                  <option value="700">700</option>
+                  <option value="900">900</option>
+                </select>
+              </div>
+              <div class="localFontSection">
+                <label>字體：</label>
+                <input
+                  type="text"
+                  class="localFontNameInput"
+                  data-idx="3"
+                  value="Hiragino Sans"
+                  list="fontList"
+                  placeholder="例如：本機字體"
+                />
+                <label>字重：</label>
+                <input
+                  type="number"
+                  class="localFontWeightInput"
+                  data-idx="3"
+                  value="500"
+                  min="100"
+                  max="900"
+                  step="100"
+                />
+              </div>
+              <button
+                type="button"
+                class="preview-btn"
+                onclick="previewSingle(3)"
+                style="margin-top: 8px"
+              >
+                預覽
+              </button>
+            </div>
+            <div class="fontPreviewResult" id="fontPreviewResult3"></div>
+          </div>
+        </div>
+        <div
+          class="font-compare-col"
+          style="
+            flex: 1;
+            min-width: 160px;
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 0 4px #ddd;
+          "
+        >
+          <div id="fontCol4">
+            <div class="input-area">
+              <label>來源：</label>
+              <select class="fontSourceSelect" data-idx="4">
+                <option value="google">Google Fonts</option>
+                <option value="local" selected>本機字體</option>
+              </select>
+              <div class="googleFontSection" style="display: none">
+                <label>字體：</label>
+                <select class="fontNameSelect" data-idx="4">
+                  <option value="Noto Sans TC">Noto Sans TC</option>
+                  <option value="Zen Kaku Gothic Antique">
+                    Zen Kaku Gothic Antique
+                  </option>
+                </select>
+                <label>字重：</label>
+                <select class="fontWeightSelect" data-idx="4">
+                  <option value="100">100</option>
+                  <option value="300">300</option>
+                  <option value="400" selected>400</option>
+                  <option value="500">500</option>
+                  <option value="700">700</option>
+                  <option value="900">900</option>
+                </select>
+              </div>
+              <div class="localFontSection">
+                <label>字體：</label>
+                <input
+                  type="text"
+                  class="localFontNameInput"
+                  data-idx="4"
+                  value="PingFang TC"
+                  list="fontList"
+                  placeholder="例如：本機字體"
+                />
+                <label>字重：</label>
+                <input
+                  type="number"
+                  class="localFontWeightInput"
+                  data-idx="4"
+                  value="500"
+                  min="100"
+                  max="900"
+                  step="100"
+                />
+              </div>
+              <button
+                type="button"
+                class="preview-btn"
+                onclick="previewSingle(4)"
+                style="margin-top: 8px"
+              >
+                預覽
+              </button>
+            </div>
+            <div class="fontPreviewResult" id="fontPreviewResult4"></div>
+          </div>
+        </div>
+      </div>
+      <div style="width: 100%; text-align: center; margin: 32px 0 16px 0">
+        <button
+          onclick="analyzeCharacters()"
+          style="font-size: 1.1em; padding: 10px 32px"
+        >
+          分析
+        </button>
+      </div>
+      <div id="result"></div>
+    </div>
+
+    <script>
+      let outputData = [];
+      const fontSize = 1000; // 與 sketch.js 一致
+      const canvasSize = 1000; // 與 sketch.js 一致
+      const fontWeights = {
+        "Noto Sans TC": [100, 300, 400, 500, 700, 900],
+        "Noto Serif TC": [200, 300, 400, 500, 600, 700, 900],
+        "Zen Kaku Gothic Antique": [300, 400, 500, 700, 900],
+        "jf蘭陽明體2.0": [400, 600],
+      };
+      // 全域本機字體清單
+      let systemFonts = [];
+      let systemFontWeights = {};
+      async function loadSystemFontsGlobal() {
+        if (!("queryLocalFonts" in window)) return;
+        try {
+          const fonts = await window.queryLocalFonts();
+          const uniqueFonts = new Set();
+          systemFontWeights = {};
+          fonts.forEach((font) => {
+            uniqueFonts.add(font.family);
+            if (!systemFontWeights[font.family])
+              systemFontWeights[font.family] = new Set();
+            if (font.weight)
+              systemFontWeights[font.family].add(Number(font.weight));
+          });
+          systemFonts = Array.from(uniqueFonts);
+          // 建立 datalist
+          let datalist = document.getElementById("fontList");
+          if (!datalist) {
+            datalist = document.createElement("datalist");
+            datalist.id = "fontList";
+            document.body.appendChild(datalist);
+          }
+          datalist.innerHTML = "";
+          systemFonts.forEach((fontName) => {
+            const option = document.createElement("option");
+            option.value = fontName;
+            datalist.appendChild(option);
+          });
+        } catch (err) {
+          console.error("讀取系統字體時發生錯誤:", err);
+        }
+      }
+      // 五欄切換來源時顯示/隱藏
+      function setupFontSourceSwitch() {
+        document.querySelectorAll(".fontSourceSelect").forEach((sel) => {
+          sel.addEventListener("change", function () {
+            const idx = this.getAttribute("data-idx");
+            const isGoogle = this.value === "google";
+            const col = document.getElementById("fontCol" + idx);
+            col.querySelector(".googleFontSection").style.display = isGoogle
+              ? ""
+              : "none";
+            col.querySelector(".localFontSection").style.display = isGoogle
+              ? "none"
+              : "";
+          });
+        });
+      }
+      // 本機字體欄位輸入時，自動查詢可用字重
+      function setupLocalFontNameInput() {
+        document.querySelectorAll(".localFontNameInput").forEach((input) => {
+          input.addEventListener("input", function () {
+            const idx = this.getAttribute("data-idx");
+            const fontName = this.value;
+            const col = document.getElementById("fontCol" + idx);
+            const weightSel = col.querySelector(".localFontWeightInput");
+            // 只有有資料時才換成<select>
+            if (
+              systemFontWeights[fontName] &&
+              systemFontWeights[fontName].size > 0
+            ) {
+              let select = document.createElement("select");
+              select.className = "localFontWeightInput";
+              select.setAttribute("data-idx", idx);
+              let weights = Array.from(systemFontWeights[fontName]).sort(
+                (a, b) => a - b
+              );
+              weights.forEach((w) => {
+                let opt = document.createElement("option");
+                opt.value = w;
+                opt.text = w;
+                select.appendChild(opt);
+              });
+              weightSel.replaceWith(select);
+            } else {
+              // 沒資料就維持 input，不動作
+            }
+          });
+        });
+        // 移除提示文字
+        document
+          .querySelectorAll(".local-font-tip")
+          .forEach((tip) => tip.remove());
+      }
+      // 五欄 Google Fonts 字體選單變動時自動更新字重選單
+      function setupGoogleFontWeightSwitch() {
+        document.querySelectorAll(".fontNameSelect").forEach((sel) => {
+          sel.addEventListener("change", function () {
+            const idx = this.getAttribute("data-idx");
+            const fontName = this.value;
+            const col = document.getElementById("fontCol" + idx);
+            const weightSel = col.querySelector(".fontWeightSelect");
+            weightSel.innerHTML = "";
+            const weights = fontWeights[fontName] || [];
+            weights.forEach((weight) => {
+              let opt = document.createElement("option");
+              opt.value = weight;
+              opt.text = weight;
+              if (weight === 500) opt.selected = true;
+              weightSel.appendChild(opt);
+            });
+            if (!weights.includes(500) && weights.length > 0) {
+              weightSel.options[0].selected = true;
+            }
+          });
+        });
+      }
+      // 分析按鈕
+      async function analyzeCharacters() {
+        await document.fonts.ready;
+        let charInput = document.getElementById("singleCharacter").value;
+        let chars = charInput.split("").filter((c) => c.trim() !== "");
+        if (chars.length === 0) return;
+        // 儲存每個欄位的分析結果（每個欄位一組陣列）
+        let results = [];
+        // 儲存每個單字的詳細數據
+        let perCharData = Array(5)
+          .fill(0)
+          .map(() => []);
+        for (let i = 0; i < 5; i++) {
+          let col = document.getElementById("fontCol" + i);
+          let fontSource = col.querySelector(".fontSourceSelect").value;
+          let fontName = "";
+          let fontWeight = "";
+          if (fontSource === "google") {
+            fontName = col.querySelector(".fontNameSelect").value;
+            fontWeight = col.querySelector(".fontWeightSelect").value;
+          } else {
+            fontName = col.querySelector(".localFontNameInput").value;
+            let weightSel = col.querySelector(".localFontWeightInput");
+            fontWeight =
+              weightSel.tagName === "SELECT"
+                ? weightSel.value
+                : weightSel.value;
+          }
+          // 多字分析
+          let bArr = [];
+          let charDetailArr = [];
+          for (let char of chars) {
+            // 像素分析（仍用 1000x1000 區間計算，避免誤差）
+            let bigCanvas = document.createElement("canvas");
+            bigCanvas.width = canvasSize;
+            bigCanvas.height = canvasSize;
+            let bigCtx = bigCanvas.getContext("2d");
+            bigCtx.fillStyle = "#fff";
+            bigCtx.fillRect(0, 0, canvasSize, canvasSize);
+            bigCtx.font = `${fontWeight} ${fontSize}px '${fontName}'`;
+            bigCtx.textAlign = "center";
+            bigCtx.textBaseline = "middle";
+            bigCtx.fillStyle = "#000";
+            bigCtx.fillText(char, canvasSize / 2, canvasSize / 2);
+            let metrics = bigCtx.measureText(char);
+            let charWidth = metrics.width;
+            let baseX = Math.round((canvasSize - charWidth) / 2);
+            let baseY = Math.round((canvasSize - charWidth) / 2);
+            let charW = Math.round(charWidth);
+            // 取樣區域（全部用整數）
+            let totalData = bigCtx.getImageData(baseX, baseY, charW, charW);
+            let mediumData = bigCtx.getImageData(
+              baseX + Math.round(charW / 6),
+              baseY + Math.round(charW / 6),
+              Math.round((charW * 2) / 3),
+              Math.round((charW * 2) / 3)
+            );
+            function calculateBlackPixel(imgData) {
+              let count = 0;
+              for (let p = 0; p < imgData.data.length; p += 4) {
+                if (imgData.data[p] < 50) count++;
+              }
+              return count;
+            }
+            let totalArea = calculateBlackPixel(totalData);
+            let mediumArea = calculateBlackPixel(mediumData);
+            let centralAreaRatio = totalArea ? mediumArea / totalArea : 0;
+            bArr.push(centralAreaRatio);
+            charDetailArr.push({
+              char,
+              centralAreaRatio,
+            });
+          }
+          perCharData[i] = charDetailArr;
+          // 平均與標準差
+          function avg(arr) {
+            return arr.reduce((a, b) => a + b, 0) / arr.length;
+          }
+          function std(arr) {
+            let mean = avg(arr);
+            return Math.sqrt(
+              arr.reduce((a, b) => a + (b - mean) ** 2, 0) / arr.length
+            );
+          }
+          let bAvg = avg(bArr);
+          let bStd = std(bArr);
+          results.push({
+            fontSource,
+            fontName,
+            fontWeight,
+            bAvg,
+            bStd,
+          });
+          // 更新預覽圖（只顯示第一個字）
+          let fontCol = document.getElementById("fontCol" + i);
+          let oldCanvas = fontCol.querySelector(".preview-canvas");
+          if (oldCanvas) oldCanvas.remove();
+          let previewChar = chars[0];
+          let canvas = document.createElement("canvas");
+          canvas.width = 100;
+          canvas.height = 100;
+          let ctx = canvas.getContext("2d");
+          ctx.fillStyle = "#fff";
+          ctx.fillRect(0, 0, 100, 100);
+          ctx.save();
+          ctx.scale(0.1, 0.1);
+          ctx.font = `${fontWeight} ${fontSize}px '${fontName}'`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = "#000";
+          ctx.fillText(previewChar, canvasSize / 2, canvasSize / 2);
+          ctx.lineWidth = 5;
+          ctx.strokeStyle = "blue";
+          ctx.strokeRect(
+            canvasSize / 2 - fontSize / 2,
+            canvasSize / 2 - fontSize / 2,
+            fontSize,
+            fontSize
+          );
+          ctx.strokeStyle = "red";
+          ctx.strokeRect(
+            canvasSize / 2 - fontSize / 3,
+            canvasSize / 2 - fontSize / 3,
+            (fontSize * 2) / 3,
+            (fontSize * 2) / 3
+          );
+          ctx.restore();
+          canvas.className = "preview-canvas";
+          fontCol.insertBefore(canvas, fontCol.firstChild);
+          // 顯示直排數值
+          let oldResult = fontCol.querySelector(".analyze-result");
+          if (oldResult) oldResult.remove();
+          let resultDiv = document.createElement("div");
+          resultDiv.className = "analyze-result";
+          resultDiv.style =
+            "margin-top:8px;text-align:center;font-size:0.98em;line-height:1.7;";
+          resultDiv.innerHTML = `指標B（中／大）<br><b>${bAvg.toFixed(
+            4
+          )}</b><br>標準差<br><b>${bStd.toFixed(4)}</b>`;
+          let previewResult = fontCol.querySelector(".fontPreviewResult");
+          fontCol.insertBefore(resultDiv, previewResult);
+        }
+        // 產生比較表格
+        function genTable(title, keyAvg, keyStd) {
+          // 以平均排序
+          let sortedByAvg = results
+            .map((r, idx) => ({ ...r, idx }))
+            .sort((a, b) => b[keyAvg] - a[keyAvg]);
+          let avgRank = Array(results.length);
+          sortedByAvg.forEach((r, i) => {
+            avgRank[r.idx] = i + 1;
+          });
+          // 以標準差排序
+          let sortedByStd = results
+            .map((r, idx) => ({ ...r, idx }))
+            .sort((a, b) => a[keyStd] - b[keyStd]);
+          let stdRank = Array(results.length);
+          sortedByStd.forEach((r, i) => {
+            stdRank[r.idx] = i + 1;
+          });
+          // 以平均排序顯示
+          let html = `<div style='text-align:center;'><div style='font-weight:bold;margin-bottom:6px;'>${title}</div>`;
+          html += `<table style='min-width:340px;margin:0 auto;'><tr><th>平均排序</th><th>字體</th><th>字重</th><th>平均</th><th>標準差</th><th>標準差排序</th></tr>`;
+          sortedByAvg.forEach((r, i) => {
+            html += `<tr><td>${i + 1}</td><td>${r.fontName}</td><td>${
+              r.fontWeight
+            }</td><td>${r[keyAvg].toFixed(4)}</td><td>${r[keyStd].toFixed(
+              4
+            )}</td><td>${stdRank[r.idx]}</td></tr>`;
+          });
+          html += `</table></div>`;
+          return html;
+        }
+        let html = `<div style='display:flex;gap:32px;justify-content:center;margin-top:24px;flex-wrap:wrap;'>`;
+        // 加上說明文字
+        html += `<div style='width:100%;text-align:center;margin-top:16px;margin-bottom:8px;color:#666;font-size:0.9em;line-height:1.5;'>`;
+        html += `<strong>數值說明：</strong>平均排序名次越高＝中宮越緊縮，平均值越高＝中宮越緊縮`;
+        html += `</div>`;
+        html += genTable("指標B（中／大）", "bAvg", "bStd");
+        html += `</div>`;
+        // 單字詳細數據表格
+        if (chars.length > 1) {
+          html += `<div style='margin-top:32px;'>`;
+          for (let i = 0; i < 5; i++) {
+            html += `<div style='margin-bottom:24px;'>`;
+            html += `<div style='font-weight:bold;margin-bottom:6px;'>欄位${
+              i + 1
+            }：${results[i].fontName}（${results[i].fontWeight}）</div>`;
+            html += `<table style='min-width:340px;margin:0 auto;font-size:1em;'><tr><th>字</th><th>指標B（中/大）</th></tr>`;
+            perCharData[i].forEach((row) => {
+              html += `<tr><td>${
+                row.char
+              }</td><td>${row.centralAreaRatio.toFixed(4)}</td></tr>`;
+            });
+            html += `</table></div>`;
+          }
+          html += `</div>`;
+        }
+        // 排序資料
+        let areaSorted = results
+          .map((r, i) => ({ i, ...r }))
+          .sort((a, b) => b.bAvg - a.bAvg);
+        // 新增：將排序名次顯示在五欄下方
+        for (let i = 0; i < 5; i++) {
+          let fontCol = document.getElementById("fontCol" + i);
+          // 先移除舊的排序名次（如有）
+          let oldRank = fontCol.querySelector(".analyze-rank");
+          if (oldRank) oldRank.remove();
+          // 找出指標B的名次
+          let bRank = areaSorted.findIndex((r) => r.i === i) + 1;
+          let rankDiv = document.createElement("div");
+          rankDiv.className = "analyze-rank";
+          rankDiv.style =
+            "margin-top:4px;text-align:center;font-size:1em;font-weight:500;line-height:1.5;";
+          rankDiv.innerHTML = `
+            <span style='color:#d32f2f;'>指標B排序：第${bRank}名</span>
+          `;
+          // 插入在 fontPreviewResult 之後
+          let previewResult = fontCol.querySelector(".fontPreviewResult");
+          if (previewResult) {
+            previewResult.parentNode.insertBefore(
+              rankDiv,
+              previewResult.nextSibling
+            );
+          } else {
+            fontCol.appendChild(rankDiv);
+          }
+        }
+        document.getElementById("result").innerHTML = html;
+      }
+      // 預覽按鈕功能
+      function previewSingle(idx) {
+        let charInput = document.getElementById("singleCharacter").value;
+        let char = charInput.length > 0 ? charInput[0] : "";
+        let col = document.getElementById("fontCol" + idx);
+        let fontSource = col.querySelector(".fontSourceSelect").value;
+        let fontName = "";
+        let fontWeight = "";
+        if (fontSource === "google") {
+          fontName = col.querySelector(".fontNameSelect").value;
+          fontWeight = col.querySelector(".fontWeightSelect").value;
+        } else {
+          fontName = col.querySelector(".localFontNameInput").value;
+          let weightSel = col.querySelector(".localFontWeightInput");
+          fontWeight =
+            weightSel.tagName === "SELECT" ? weightSel.value : weightSel.value;
+        }
+        // 建立 canvas 預覽（縮小 100x100）
+        let canvas = document.createElement("canvas");
+        canvas.width = 100;
+        canvas.height = 100;
+        let ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, 100, 100);
+        ctx.save();
+        ctx.scale(0.1, 0.1);
+        ctx.font = `${fontWeight} ${fontSize}px '${fontName}'`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#000";
+        ctx.fillText(char, canvasSize / 2, canvasSize / 2);
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "blue";
+        ctx.strokeRect(
+          canvasSize / 2 - fontSize / 2,
+          canvasSize / 2 - fontSize / 2,
+          fontSize,
+          fontSize
+        );
+        ctx.strokeStyle = "red";
+        ctx.strokeRect(
+          canvasSize / 2 - fontSize / 3,
+          canvasSize / 2 - fontSize / 3,
+          (fontSize * 2) / 3,
+          (fontSize * 2) / 3
+        );
+        ctx.restore();
+        // 先移除舊的 canvas（如有）
+        let oldCanvas = col.querySelector(".preview-canvas");
+        if (oldCanvas) oldCanvas.remove();
+        canvas.className = "preview-canvas";
+        col.insertBefore(canvas, col.firstChild);
+      }
+      // 初始化
+      window.addEventListener("DOMContentLoaded", async function () {
+        await loadSystemFontsGlobal();
+        setupFontSourceSwitch();
+        setupLocalFontNameInput();
+        setupAllGoogleFontWeightOptions();
+        setupGoogleFontWeightSwitch();
+      });
+
+      function getTightnessTable(style, weight, structure) {
+        const db = {
+          明體: {
+            細: {
+              左右結構: {
+                收緊: [0.63946, 0.04493],
+                中等: [0.63946, 0.04493],
+                開放: [0.55763, 0.04824],
+              },
+              上下結構: {
+                收緊: [0.65959, 0.05667],
+                中等: [0.65959, 0.05667],
+                開放: [0.57401, 0.06064],
+              },
+              包圍結構: {
+                收緊: [0.63951, 0.07392],
+                中等: [0.63951, 0.07392],
+                開放: [0.53946, 0.07003],
+              },
+              "獨體/交叉結構": {
+                收緊: [0.69552, 0.08769],
+                中等: [0.69552, 0.08769],
+                開放: [0.55197, 0.13966],
+              },
+            },
+            中: {
+              左右結構: {
+                收緊: [0.64194, 0.04641],
+                中等: [0.6239, 0.03621],
+                開放: [0.55532, 0.04432],
+              },
+              上下結構: {
+                收緊: [0.65608, 0.05351],
+                中等: [0.64668, 0.04672],
+                開放: [0.57017, 0.05294],
+              },
+              包圍結構: {
+                收緊: [0.63553, 0.07042],
+                中等: [0.62329, 0.05398],
+                開放: [0.53663, 0.06134],
+              },
+              "獨體/交叉結構": {
+                收緊: [0.69804, 0.07673],
+                中等: [0.69334, 0.07115],
+                開放: [0.55931, 0.11978],
+              },
+            },
+            粗: {
+              左右結構: {
+                收緊: [0.64905, 0.07159],
+                中等: [0.62142, 0.06167],
+                開放: [0.5728, 0.0477],
+              },
+              上下結構: {
+                收緊: [0.64989, 0.0689],
+                中等: [0.68717, 0.08118],
+                開放: [0.60102, 0.06065],
+              },
+              包圍結構: {
+                收緊: [0.65198, 0.06444],
+                中等: [0.6239, 0.06583],
+                開放: [0.56793, 0.0702],
+              },
+              "獨體/交叉結構": {
+                收緊: [0.65031, 0.06837],
+                中等: [0.6875, 0.0801],
+                開放: [0.6076, 0.12042],
+              },
+            },
+          },
+          黑體: {
+            細: {
+              左右結構: {
+                收緊: [0.58949, 0.04049],
+                中等: [0.59013, 0.04529],
+                開放: [0.54013, 0.03845],
+              },
+              上下結構: {
+                收緊: [0.61183, 0.04937],
+                中等: [0.61828, 0.05539],
+                開放: [0.56133, 0.04586],
+              },
+              包圍結構: {
+                收緊: [0.57725, 0.0599],
+                中等: [0.57239, 0.07425],
+                開放: [0.53663, 0.05835],
+              },
+              "獨體/交叉結構": {
+                收緊: [0.63058, 0.10173],
+                中等: [0.62029, 0.10702],
+                開放: [0.57053, 0.13063],
+              },
+            },
+            中: {
+              左右結構: {
+                收緊: [0.58839, 0.0477],
+                中等: [0.58081, 0.0412],
+                開放: [0.52845, 0.03809],
+              },
+              上下結構: {
+                收緊: [0.60954, 0.05706],
+                中等: [0.61168, 0.05206],
+                開放: [0.54929, 0.04494],
+              },
+              包圍結構: {
+                收緊: [0.57368, 0.07034],
+                中等: [0.58049, 0.05976],
+                開放: [0.53239, 0.05437],
+              },
+              "獨體/交叉結構": {
+                收緊: [0.61633, 0.10738],
+                中等: [0.6244, 0.10627],
+                開放: [0.55462, 0.12643],
+              },
+            },
+            粗: {
+              左右結構: {
+                收緊: [0.59843, 0.08729],
+                中等: [0.59934, 0.07195],
+                開放: [0.5589, 0.08693],
+              },
+              上下結構: {
+                收緊: [0.59606, 0.07951],
+                中等: [0.60433, 0.044],
+                開放: [0.5728, 0.0477],
+              },
+              包圍結構: {
+                收緊: [0.60229, 0.07012],
+                中等: [0.63153, 0.05203],
+                開放: [0.56793, 0.0702],
+              },
+              "獨體/交叉結構": {
+                收緊: [0.59892, 0.07931],
+                中等: [0.59821, 0.0682],
+                開放: [0.6076, 0.12042],
+              },
+            },
+          },
+        };
+        return db[style][weight][structure];
+      }
+
+      // 新增這個函數來獲取正確的字體權重類名
+      function getFontWeightClass(fontName, weight) {
+        let fontNameKebabCase = fontName.toLowerCase().replace(/ /g, "-");
+        let weightName = getWeightName(weight);
+        return `${fontNameKebabCase}-${weightName}`;
+      }
+
+      // 新增這個函數來將數字權重轉換為對應的名稱
+      function getWeightName(weight) {
+        const weightMap = {
+          100: "thin",
+          200: "extra-light",
+          300: "light",
+          400: "regular",
+          500: "medium",
+          600: "semi-bold",
+          700: "bold",
+          900: "black",
+        };
+        return weightMap[weight] || "regular";
+      }
+
+      function setupAllGoogleFontWeightOptions() {
+        document.querySelectorAll(".fontNameSelect").forEach((fontSel) => {
+          const idx = fontSel.getAttribute("data-idx");
+          const col = document.getElementById("fontCol" + idx);
+          const weightSel = col.querySelector(".fontWeightSelect");
+          // 取得目前選擇的字體
+          const fontName = fontSel.value;
+          // 清空現有選項
+          weightSel.innerHTML = "";
+          // 依據 fontWeights 產生新選項
+          const weights = fontWeights[fontName] || [];
+          weights.forEach((weight) => {
+            let opt = document.createElement("option");
+            opt.value = weight;
+            opt.text = weight;
+            // 若 weight 為 500 則預設選取
+            if (weight === 500) opt.selected = true;
+            weightSel.appendChild(opt);
+          });
+          // 如果沒有 500，則選第一個
+          if (!weights.includes(500) && weights.length > 0) {
+            weightSel.options[0].selected = true;
+          }
+        });
+      }
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+  </body>
+</html>
